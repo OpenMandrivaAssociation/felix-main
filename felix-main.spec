@@ -8,7 +8,7 @@
 
 Name:    %{project}-main
 Version: 2.0.5
-Release: 7
+Release: 9
 Summary: Apache Felix Main
 
 Group:   Development/Java
