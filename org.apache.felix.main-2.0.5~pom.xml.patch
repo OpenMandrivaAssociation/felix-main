@@ -1,0 +1,62 @@
+diff -Nur org.apache.felix.main-2.0.5/pom.xml org.apache.felix.main-2.0.5.new/pom.xml
+--- org.apache.felix.main-2.0.5/pom.xml	2010-04-12 03:56:51.000000000 +0400
++++ org.apache.felix.main-2.0.5.new/pom.xml	2010-07-26 22:19:42.783965287 +0400
+@@ -44,6 +44,7 @@
+         </exclusion>
+       </exclusions>
+     </dependency>
++<!--
+     <dependency>
+       <groupId>${pom.groupId}</groupId>
+       <artifactId>org.apache.felix.shell</artifactId>
+@@ -105,6 +106,7 @@
+         </exclusion>
+       </exclusions>
+     </dependency>
++-->
+   </dependencies>
+   <properties>
+     <log.level>1</log.level>
+@@ -138,14 +140,14 @@
+             <Bundle-Name>Apache Felix</Bundle-Name>
+             <Bundle-Description>OSGi R4 framework.</Bundle-Description>
+             <Bundle-Vendor>The Apache Software Foundation</Bundle-Vendor>
+-            <Embed-Dependency>*;artifactId=org.apache.felix.framework;inline=true</Embed-Dependency>
+             <Private-Package>org.apache.felix.main.*</Private-Package>
+-            <Export-Package>!org.osgi.service.log, !org.osgi.service.obr,org.osgi.*</Export-Package>
++            <Export-Package>!org.osgi.*</Export-Package>
+             <Import-Package>!*</Import-Package>
+             <Include-Resource>META-INF/LICENSE=LICENSE,META-INF/NOTICE=NOTICE,{src/main/resources/}</Include-Resource>
+           </instructions>
+         </configuration>
+       </plugin>
++<!--
+       <plugin>
+         <groupId>org.codehaus.mojo</groupId>
+         <artifactId>rat-maven-plugin</artifactId>
+@@ -161,6 +163,8 @@
+           </excludes>
+         </configuration>
+       </plugin>
++-->
++<!--
+       <plugin>
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-dependency-plugin</artifactId>
+@@ -219,6 +223,8 @@
+           </execution>
+         </executions>
+       </plugin>
++-->
++<!--
+       <plugin>
+         <artifactId>maven-antrun-plugin</artifactId>
+         <executions>
+@@ -240,6 +246,7 @@
+           </execution>
+         </executions>
+       </plugin>
++-->
+     </plugins>
+     <resources>
+       <resource>
