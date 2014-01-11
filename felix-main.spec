@@ -1,120 +1,114 @@
-# Prevent brp-java-repack-jars from being run.
-%define __jar_repack %{nil}
-
-%global project felix
+%{?_javapackages_macros:%_javapackages_macros}
 %global bundle org.apache.felix.main
-%global groupId org.apache.felix
-%global artifactId %{bundle}
 
-Name:    %{project}-main
-Version: 2.0.5
-Release: 9
+Name:    felix-main
+Version: 4.2.0
+Release: 4.0%{?dist}
 Summary: Apache Felix Main
 
-Group:   Development/Java
 License: ASL 2.0
 URL:     http://felix.apache.org
-Source0: http://www.apache.org/dist/felix/%{bundle}-%{version}-project.tar.gz
-
-# TODO check availability and use original artifacts:
-# - org.apache.felix.shell https://bugzilla.redhat.com/show_bug.cgi?id=615869
-Patch0: %{bundle}-%{version}~pom.xml.patch
-Patch1:	felix-main-pom.xml.fix_build.patch
+Source0: http://www.apache.org/dist/felix/%{bundle}-%{version}-source-release.tar.gz
 
 BuildArch: noarch
 
-BuildRequires: java-devel >= 0:1.6.0
+BuildRequires: java-devel >= 1:1.6.0
 BuildRequires: jpackage-utils
-BuildRequires: felix-parent
+BuildRequires: felix-bundlerepository
+BuildRequires: felix-gogo-command
+BuildRequires: felix-gogo-runtime
+BuildRequires: felix-gogo-shell
 BuildRequires: felix-osgi-compendium
 BuildRequires: felix-osgi-core
-BuildRequires: felix-framework
-BuildRequires: maven2
-BuildRequires:    maven-antrun-plugin
-BuildRequires:    maven-compiler-plugin
-BuildRequires:    maven-dependency-plugin
-BuildRequires:    maven-install-plugin
-BuildRequires:    maven-invoker-plugin
-BuildRequires:    maven-jar-plugin
-BuildRequires:    maven-javadoc-plugin
-BuildRequires:    maven-release-plugin
-BuildRequires:    maven-resources-plugin
-BuildRequires:    maven-surefire-plugin
-BuildRequires:    maven-surefire-provider-junit4
-# TODO check availability and use new names
-#BuildRequires:    maven-bundle-plugin
-# instead of
-BuildRequires:    maven-plugin-bundle
+BuildRequires: felix-framework >= 4.2.0
+BuildRequires: maven-local
+BuildRequires: maven-dependency-plugin
+BuildRequires: maven-surefire-provider-junit4
+BuildRequires: mockito
 
+Requires: felix-bundlerepository
+Requires: felix-gogo-command
+Requires: felix-gogo-runtime
+Requires: felix-gogo-shell
 Requires: felix-osgi-compendium
 Requires: felix-osgi-core
-Requires: felix-framework
-Requires: java >= 0:1.6.0
-
-Requires(post):   jpackage-utils
-Requires(postun): jpackage-utils
+Requires: felix-framework >= 4.2.0
+Requires: java >= 1:1.6.0
 
 %description
 Apache Felix Main Classes.
 
 %package javadoc
-Group:          Development/Java
-Summary:        Javadoc for %{name}
-Requires:       jpackage-utils
+
+Summary:        API documentation for %{name}
 
 %description javadoc
-API documentation for %{name}.
-
-%global POM %{_mavenpomdir}/JPP.%{project}-%{bundle}.pom
+This package contains API documentation for %{name}.
 
 %prep
 %setup -q -n %{bundle}-%{version}
-%patch0 -p1 -b .sav
-%patch1 -p0 -b fix_build
+
+%mvn_file :%{bundle} "felix/%{bundle}"
 
 %build
-export MAVEN_REPO_LOCAL=$(pwd)/.m2/repository
-%__mkdir_p $MAVEN_REPO_LOCAL
-mvn-jpp -e \
-        -Dmaven.repo.local=$MAVEN_REPO_LOCAL \
-        install javadoc:javadoc
+%mvn_build
 
 %install
-# jars
-install -d -m 0755 %{buildroot}%{_javadir}/%{project}
-install -m 644 target/%{bundle}-%{version}.jar \
-        %{buildroot}%{_javadir}/%{project}/%{bundle}.jar
+%mvn_install
 
-%add_to_maven_depmap %{groupId} %{artifactId} %{version} JPP/%{project} %{bundle}
+%files -f .mfiles
+%doc LICENSE NOTICE DEPENDENCIES
 
-# poms
-install -d -m 755 %{buildroot}%{_mavenpomdir}
-install -pm 644 pom.xml %{buildroot}%{POM}
+%files javadoc -f .mfiles-javadoc
+%doc LICENSE NOTICE
 
-# javadoc
-install -d -m 0755 %{buildroot}%{_javadocdir}/%{name}
-%__cp -pr target/site/api*/* %{buildroot}%{_javadocdir}/%{name}
+%changelog
+* Mon Aug 05 2013 Mat Booth <fedora@matbooth.co.uk> - 4.2.0-4
+- Update for latest guidelines
 
-%post
-%update_maven_depmap
+* Sat Aug 03 2013 Mat Booth <fedora@matbooth.co.uk> - 4.2.0-3
+- Add missing BRs
 
-%postun
-%update_maven_depmap
+* Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 4.2.0-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
 
-%pre javadoc
-# workaround for rpm bug, can be removed in F-17
-[ $1 -gt 1 ] && [ -L %{_javadocdir}/%{name} ] && \
-rm -rf $(readlink -f %{_javadocdir}/%{name}) %{_javadocdir}/%{name} || :
+* Thu Feb 21 2013 Mat Booth <fedora@matbooth.co.uk> - 4.2.0-1
+- Update to latest upstream version.
+- Update spec to newer guidelines rhbz #810215.
+- Fix FTBFS following mass rebuild.
 
-%files
-%defattr(-,root,root,-)
-%{_javadir}/%{project}/*
-%{POM}
-%config(noreplace) %{_mavendepmapfragdir}/%{name}
-%doc LICENSE
+* Wed Feb 13 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.0.5-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_19_Mass_Rebuild
 
-%files javadoc
-%defattr(-,root,root,-)
-%{_javadocdir}/%{name}
-%doc LICENSE
+* Thu Jul 19 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.0.5-9
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
 
+* Fri Jan 13 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.0.5-8
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
+
+* Tue Feb 08 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.0.5-7
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
+
+* Tue Dec  7 2010 Stanislav Ochotnicky <sochotnicky@redhat.com> - 2.0.5-6
+- Fix pom filename (Resolves rhbz#655799)
+- Fix BR of surefire-plugin
+- Fix various packaging things according to new guidelines
+
+* Mon Jul 26 2010 Victor G. Vasilyev <victor.vasilyev@sun.com> 2.0.5-5
+- Remove R: felix-parent
+
+* Mon Jul 26 2010 Victor G. Vasilyev <victor.vasilyev@sun.com> 2.0.5-4
+- Use felix-parent https://bugzilla.redhat.com/show_bug.cgi?id=615868
+- Remove demap file option from mvn-jpp command
+
+* Sat Jul 24 2010 Victor G. Vasilyev <victor.vasilyev@sun.com> 2.0.5-3
+- Add TODOs for uncompleted activities against maven packages
+- Use new names of the maven plgins
+- Add license file to independent subpackage javadoc
+- Remove unneeded demap file
+
+* Tue Jul 13 2010 Victor G. Vasilyev <victor.vasilyev@sun.com> 2.0.5-2
+- Use maven instead of ant
+
+* Tue Jun 22 2010 Victor G. Vasilyev <victor.vasilyev@sun.com> 2.0.5-1
+- Release 2.0.5
