@@ -3,7 +3,7 @@
 
 Name:    felix-main
 Version: 4.2.0
-Release: 4.0%{?dist}
+Release: 4.1
 Summary: Apache Felix Main
 
 License: ASL 2.0
@@ -21,6 +21,7 @@ BuildRequires: felix-gogo-shell
 BuildRequires: felix-osgi-compendium
 BuildRequires: felix-osgi-core
 BuildRequires: felix-framework >= 4.2.0
+BuildRequires: mvn(org.apache.felix:felix-parent:pom:)
 BuildRequires: maven-local
 BuildRequires: maven-dependency-plugin
 BuildRequires: maven-surefire-provider-junit4
