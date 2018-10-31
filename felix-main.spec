@@ -3,7 +3,7 @@
 
 Name:    felix-main
 Version: 4.2.0
-Release: 4.1
+Release: 4.2
 Summary: Apache Felix Main
 
 License: ASL 2.0
